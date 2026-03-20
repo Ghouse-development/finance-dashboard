@@ -11,6 +11,7 @@ const navItems = [
   { href: "/", label: "ダッシュボード", icon: "📊" },
   { href: "/master", label: "入金予定マスター", icon: "📋" },
   { href: "/check", label: "入金チェック", icon: "✅" },
+  { href: "/payment-out", label: "出金管理", icon: "💸" },
 ];
 
 export default function RootLayout({

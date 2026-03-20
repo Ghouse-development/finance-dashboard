@@ -2,71 +2,80 @@
 
 import { useState } from "react";
 import {
-  properties,
-  paymentSchedules,
-  getStatusColor,
-  getStatus,
+  masterSchedulesMarch,
+  masterSchedulesApril,
   formatCurrency,
 } from "@/lib/dummy-data";
+import type { MasterScheduleRow } from "@/lib/dummy-data";
+
+const monthOptions = [
+  { value: "2026-03", label: "2026年3月" },
+  { value: "2026-04", label: "2026年4月" },
+];
+
+function getDataForMonth(month: string): MasterScheduleRow[] {
+  if (month === "2026-03") return masterSchedulesMarch;
+  if (month === "2026-04") return masterSchedulesApril;
+  return [];
+}
 
 export default function MasterPage() {
-  const [filterMonth, setFilterMonth] = useState("");
-  const [filterProperty, setFilterProperty] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
-
-  const filtered = paymentSchedules.filter((s) => {
-    if (filterMonth) {
-      const d = new Date(s.scheduled_date);
-      const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-      if (ym !== filterMonth) return false;
-    }
-    if (filterProperty && s.property_id !== filterProperty) return false;
-    return true;
+  const [selectedMonth, setSelectedMonth] = useState("2026-03");
+  const [excludedMap, setExcludedMap] = useState<Record<string, boolean>>(() => {
+    // 初期値：isExcluded: true のものを反映
+    const map: Record<string, boolean> = {};
+    [...masterSchedulesMarch, ...masterSchedulesApril].forEach((row) => {
+      if (row.isExcluded) map[row.id] = true;
+    });
+    return map;
   });
+
+  const allRows = getDataForMonth(selectedMonth);
+  const carryoverRows = allRows.filter((r) => r.carryoverFrom !== null);
+  const normalRows = allRows.filter((r) => r.carryoverFrom === null);
+
+  // KPI
+  const totalAmount = allRows.reduce((sum, r) => sum + r.amount, 0);
+  const carryoverAmount = carryoverRows.reduce((sum, r) => sum + r.amount, 0);
+  const newAmount = normalRows.reduce((sum, r) => sum + r.amount, 0);
+
+  const displayMonth = monthOptions.find((m) => m.value === selectedMonth)?.label ?? selectedMonth;
+
+  const toggleExcluded = (id: string) => {
+    setExcludedMap((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">入金予定マスター</h2>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-          + 新規登録
-        </button>
-      </div>
-
-      {/* フィルター */}
-      <div className="flex gap-4 mb-6">
-        <div>
-          <label className="block text-xs text-slate-500 mb-1">対象月</label>
-          <input
-            type="month"
-            value={filterMonth}
-            onChange={(e) => setFilterMonth(e.target.value)}
-            className="border border-slate-300 rounded-md px-3 py-1.5 text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-xs text-slate-500 mb-1">物件</label>
+        <div className="flex items-center gap-4">
           <select
-            value={filterProperty}
-            onChange={(e) => setFilterProperty(e.target.value)}
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
             className="border border-slate-300 rounded-md px-3 py-1.5 text-sm"
           >
-            <option value="">全物件</option>
-            {properties.map((p) => (
-              <option key={p.id} value={p.id}>{p.property_name}</option>
+            {monthOptions.map((m) => (
+              <option key={m.value} value={m.value}>{m.label}</option>
             ))}
           </select>
         </div>
-        {(filterMonth || filterProperty) && (
-          <div className="flex items-end">
-            <button
-              onClick={() => { setFilterMonth(""); setFilterProperty(""); }}
-              className="text-sm text-slate-500 hover:text-slate-700 underline pb-1.5"
-            >
-              クリア
-            </button>
-          </div>
-        )}
+      </div>
+
+      {/* KPIサマリー */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="bg-white rounded-lg border border-slate-200 p-4">
+          <p className="text-xs text-slate-500 mb-1">{displayMonth} 入金予定合計</p>
+          <p className="text-xl font-bold">{formatCurrency(totalAmount)}</p>
+        </div>
+        <div className="bg-white rounded-lg border border-slate-200 p-4">
+          <p className="text-xs text-slate-500 mb-1">うち繰越案件</p>
+          <p className="text-xl font-bold text-orange-600">{formatCurrency(carryoverAmount)}</p>
+        </div>
+        <div className="bg-white rounded-lg border border-slate-200 p-4">
+          <p className="text-xs text-slate-500 mb-1">{displayMonth} 新規予定</p>
+          <p className="text-xl font-bold">{formatCurrency(newAmount)}</p>
+        </div>
       </div>
 
       {/* テーブル */}
@@ -75,110 +84,111 @@ export default function MasterPage() {
           <table className="w-full text-sm">
             <thead className="bg-slate-50">
               <tr>
-                <th className="text-left p-3 font-medium text-slate-600">契約番号</th>
+                <th className="text-left p-3 font-medium text-slate-600 w-10">除外</th>
                 <th className="text-left p-3 font-medium text-slate-600">物件名</th>
-                <th className="text-left p-3 font-medium text-slate-600">施主名</th>
+                <th className="text-left p-3 font-medium text-slate-600">担当</th>
                 <th className="text-left p-3 font-medium text-slate-600">入金区分</th>
-                <th className="text-left p-3 font-medium text-slate-600">入金予定日</th>
                 <th className="text-right p-3 font-medium text-slate-600">入金予定額</th>
-                <th className="text-right p-3 font-medium text-slate-600">入金割合</th>
-                <th className="text-left p-3 font-medium text-slate-600">備考</th>
+                <th className="text-left p-3 font-medium text-slate-600">入金予定日</th>
+                <th className="text-left p-3 font-medium text-slate-600">コメント</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((s) => {
-                const prop = properties.find((p) => p.id === s.property_id);
-                if (!prop) return null;
-                const ratio = ((s.scheduled_amount / prop.contract_amount) * 100).toFixed(1);
-                return (
-                  <tr
-                    key={s.id}
-                    onClick={() => setEditingId(s.id)}
-                    className="border-t border-slate-100 hover:bg-blue-50 cursor-pointer transition-colors"
-                  >
-                    <td className="p-3 font-mono text-xs">{prop.contract_number}</td>
-                    <td className="p-3">{prop.property_name}</td>
-                    <td className="p-3">{prop.owner_name}</td>
-                    <td className="p-3">
-                      <span className="inline-block px-2 py-0.5 bg-slate-100 rounded text-xs">
-                        {s.category}
+              {/* 繰越セクション */}
+              {carryoverRows.length > 0 && (
+                <>
+                  <tr>
+                    <td colSpan={7} className="bg-orange-50 border-t border-orange-200 px-3 py-2">
+                      <span className="text-sm font-bold text-orange-700">
+                        繰越案件　{carryoverRows.length}件　—　{carryoverRows[0].carryoverFrom}月の除外フラグから自動繰越
                       </span>
                     </td>
-                    <td className="p-3">{s.scheduled_date}</td>
-                    <td className="p-3 text-right font-mono">{formatCurrency(s.scheduled_amount)}</td>
-                    <td className="p-3 text-right">{ratio}%</td>
-                    <td className="p-3 text-slate-400">{s.notes || "—"}</td>
                   </tr>
-                );
-              })}
+                  {carryoverRows.map((row) => (
+                    <ScheduleRow
+                      key={row.id}
+                      row={row}
+                      isExcluded={!!excludedMap[row.id]}
+                      onToggleExcluded={() => toggleExcluded(row.id)}
+                      isCarryover
+                    />
+                  ))}
+                </>
+              )}
+              {/* 通常案件 */}
+              {normalRows.map((row) => (
+                <ScheduleRow
+                  key={row.id}
+                  row={row}
+                  isExcluded={!!excludedMap[row.id]}
+                  onToggleExcluded={() => toggleExcluded(row.id)}
+                  isCarryover={false}
+                />
+              ))}
             </tbody>
           </table>
         </div>
-        {filtered.length === 0 && (
+        {allRows.length === 0 && (
           <p className="p-8 text-center text-slate-400">該当するデータがありません</p>
         )}
       </div>
-
-      {/* 編集モーダル（簡易版） */}
-      {editingId && (
-        <EditModal
-          scheduleId={editingId}
-          onClose={() => setEditingId(null)}
-        />
-      )}
     </div>
   );
 }
 
-function EditModal({ scheduleId, onClose }: { scheduleId: string; onClose: () => void }) {
-  const schedule = paymentSchedules.find((s) => s.id === scheduleId);
-  const prop = properties.find((p) => p.id === schedule?.property_id);
-  if (!schedule || !prop) return null;
-
+function ScheduleRow({
+  row,
+  isExcluded,
+  onToggleExcluded,
+  isCarryover,
+}: {
+  row: MasterScheduleRow;
+  isExcluded: boolean;
+  onToggleExcluded: () => void;
+  isCarryover: boolean;
+}) {
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-lg font-bold mb-4">入金予定 編集</h3>
-        <div className="space-y-3 text-sm">
-          <Field label="物件名" value={prop.property_name} />
-          <Field label="契約番号" value={prop.contract_number} />
-          <Field label="施主名" value={prop.owner_name} />
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">入金区分</label>
-            <select className="w-full border border-slate-300 rounded-md px-3 py-2" defaultValue={schedule.category}>
-              {["申込金", "契約金", "着工金", "中間金", "引渡金"].map((c) => (
-                <option key={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">入金予定日</label>
-            <input type="date" className="w-full border border-slate-300 rounded-md px-3 py-2" defaultValue={schedule.scheduled_date} />
-          </div>
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">入金予定額（税込）</label>
-            <input type="number" className="w-full border border-slate-300 rounded-md px-3 py-2" defaultValue={schedule.scheduled_amount} />
-          </div>
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">備考</label>
-            <textarea className="w-full border border-slate-300 rounded-md px-3 py-2" rows={2} defaultValue={schedule.notes} />
-          </div>
+    <tr className={`border-t border-slate-100 hover:bg-blue-50 transition-colors ${isCarryover ? "bg-orange-50/30" : ""}`}>
+      <td className="p-3">
+        <div className="flex flex-col items-center gap-1">
+          <input
+            type="checkbox"
+            checked={isExcluded}
+            onChange={onToggleExcluded}
+            className="w-4 h-4 rounded border-slate-300"
+          />
+          {isExcluded && (
+            <span className="text-[10px] text-red-600 font-medium whitespace-nowrap">→ 翌月に繰越</span>
+          )}
         </div>
-        <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800">キャンセル</button>
-          <button onClick={onClose} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">保存（ダミー）</button>
+      </td>
+      <td className="p-3">
+        <div className="flex items-center gap-2">
+          <span>{row.propertyName}</span>
+          {isCarryover && (
+            <span className="inline-block px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded text-[10px] font-bold">繰越</span>
+          )}
         </div>
-      </div>
-    </div>
+        {isCarryover && row.carryoverFrom && (
+          <p className="text-[11px] text-slate-500 mt-0.5">{row.carryoverFrom}月除外理由：月ずれ容認</p>
+        )}
+      </td>
+      <td className="p-3">{row.staffName}</td>
+      <td className="p-3">
+        <span className="inline-block px-2 py-0.5 bg-slate-100 rounded text-xs">{row.paymentType}</span>
+      </td>
+      <td className="p-3 text-right font-mono">{formatCurrency(row.amount)}</td>
+      <td className="p-3">{row.scheduledDate}</td>
+      <td className="p-3">
+        {row.salesComment ? (
+          <div className="bg-orange-50 border border-orange-200 rounded-md px-3 py-2 max-w-xs">
+            <p className="text-[10px] text-orange-500 font-medium mb-0.5">営業コメント</p>
+            <p className="text-xs text-orange-800">{row.salesComment}</p>
+          </div>
+        ) : (
+          <span className="text-slate-400">—</span>
+        )}
+      </td>
+    </tr>
   );
 }
-
-function Field({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <label className="block text-xs text-slate-500 mb-1">{label}</label>
-      <p className="px-3 py-2 bg-slate-50 rounded-md">{value}</p>
-    </div>
-  );
-}
-
