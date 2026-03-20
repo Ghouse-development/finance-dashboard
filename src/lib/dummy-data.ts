@@ -162,6 +162,37 @@ export const masterSchedulesApril: MasterScheduleRow[] = [
   { id: "ps-apr-3",   propertyName: "◇◇邸", staffName: "田中", paymentType: "引渡金",  amount: 12580000, scheduledDate: "2026/04/28", status: "pending", salesComment: "引渡日が4/25確定。翌営業日着金予定。", isExcluded: false, excludedMonth: null, carryoverFrom: null },
 ];
 
+// CFグラフ期間別ダミーデータ
+export const CASHFLOW_QUARTER = [
+  { month: "1月",  income: 2000000,  payment: 4100000 },
+  { month: "2月",  income: 9700000,  payment: 6200000 },
+  { month: "3月",  income: 12580000, payment: 7100000 },
+];
+
+export const CASHFLOW_HALF = [
+  { month: "10月", income: 0,         payment: 1200000 },
+  { month: "11月", income: 5000000,   payment: 3800000 },
+  { month: "12月", income: 9700000,   payment: 5200000 },
+  { month: "1月",  income: 2000000,   payment: 4100000 },
+  { month: "2月",  income: 9700000,   payment: 6200000 },
+  { month: "3月",  income: 12580000,  payment: 7100000 },
+];
+
+export const CASHFLOW_YEAR = [
+  { month: "4月",  income: 3200000,  payment: 2800000 },
+  { month: "5月",  income: 4100000,  payment: 3200000 },
+  { month: "6月",  income: 6002424,  payment: 4100000 },
+  { month: "7月",  income: 6100000,  payment: 3900000 },
+  { month: "8月",  income: 0,         payment: 2200000 },
+  { month: "9月",  income: 5000000,  payment: 3500000 },
+  { month: "10月", income: 0,         payment: 1200000 },
+  { month: "11月", income: 5000000,  payment: 3800000 },
+  { month: "12月", income: 9700000,  payment: 5200000 },
+  { month: "1月",  income: 2000000,  payment: 4100000 },
+  { month: "2月",  income: 9700000,  payment: 6200000 },
+  { month: "3月",  income: 12580000, payment: 7100000 },
+];
+
 // ヘルパー関数
 export function getProperty(id: string): Property | undefined {
   return properties.find((p) => p.id === id);

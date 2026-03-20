@@ -9,7 +9,7 @@ const config: Record<BillStatus, { label: string; className: string }> = {
 export default function StatusBadge({ status }: { status: BillStatus }) {
   const { label, className } = config[status];
   return (
-    <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${className}`}>
+    <span className={`inline-block px-2 py-0.5 rounded-md text-xs font-medium whitespace-nowrap ${className}`}>
       {label}
     </span>
   );

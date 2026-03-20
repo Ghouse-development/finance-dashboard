@@ -1,7 +1,7 @@
 "use client";
 
+import { useState } from "react";
 import {
-  BarChart,
   Bar,
   Line,
   XAxis,
@@ -12,29 +12,50 @@ import {
   ResponsiveContainer,
   ComposedChart,
 } from "recharts";
+import { CASHFLOW_QUARTER, CASHFLOW_HALF, CASHFLOW_YEAR } from "@/lib/dummy-data";
 
-const CASHFLOW_DATA = [
-  { month: "10月", income: 0,        payment: 1200000 },
-  { month: "11月", income: 5000000,  payment: 3800000 },
-  { month: "12月", income: 9700000,  payment: 5200000 },
-  { month: "1月",  income: 2000000,  payment: 4100000 },
-  { month: "2月",  income: 9700000,  payment: 6200000 },
-  { month: "3月",  income: 12580000, payment: 7100000 },
-].map((d) => ({
-  ...d,
-  net: d.income - d.payment,
-}));
+type Period = "quarter" | "half" | "year";
+
+const dataMap: Record<Period, typeof CASHFLOW_QUARTER> = {
+  quarter: CASHFLOW_QUARTER,
+  half: CASHFLOW_HALF,
+  year: CASHFLOW_YEAR,
+};
 
 function toMan(value: number) {
   return `${(value / 10000).toLocaleString()}万`;
 }
 
 export default function CashflowChart() {
+  const [period, setPeriod] = useState<Period>("quarter");
+
+  const chartData = dataMap[period].map((d) => ({
+    ...d,
+    net: d.income - d.payment,
+  }));
+
   return (
     <div className="bg-white rounded-lg border border-slate-200 p-3">
-      <h3 className="text-sm font-medium mb-2">月別キャッシュフロー</h3>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-medium">月別キャッシュフロー</span>
+        <div className="flex gap-1">
+          {(["quarter", "half", "year"] as Period[]).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPeriod(p)}
+              className={`px-2 py-0.5 text-xs rounded-md ${
+                period === p
+                  ? "bg-gray-900 text-white"
+                  : "bg-gray-100 text-gray-500"
+              }`}
+            >
+              {p === "quarter" ? "四半期" : p === "half" ? "半期" : "年間"}
+            </button>
+          ))}
+        </div>
+      </div>
       <ResponsiveContainer width="100%" height={200}>
-        <ComposedChart data={CASHFLOW_DATA} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
+        <ComposedChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
           <XAxis dataKey="month" tick={{ fontSize: 11 }} />
           <YAxis tickFormatter={toMan} tick={{ fontSize: 11 }} width={60} />
@@ -50,8 +71,8 @@ export default function CashflowChart() {
               value === "income" ? "入金" : value === "payment" ? "支払" : "差引"
             }
           />
-          <Bar dataKey="income" fill="#22c55e" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="payment" fill="#f97316" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="income" fill="#22c55e" barSize={14} radius={[3, 3, 0, 0]} />
+          <Bar dataKey="payment" fill="#f97316" barSize={14} radius={[3, 3, 0, 0]} />
           <Line
             dataKey="net"
             type="monotone"
