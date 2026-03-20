@@ -2,12 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import StatusBadge from "@/components/StatusBadge";
 import {
   properties,
   paymentSchedules,
   getRecordForSchedule,
-  getStatus,
-  getStatusColor,
   formatCurrency,
 } from "@/lib/dummy-data";
 
@@ -66,6 +65,7 @@ export default function CheckPage() {
                 <th className="text-left p-3 font-medium text-slate-600">実入金日</th>
                 <th className="text-right p-3 font-medium text-slate-600">実入金額</th>
                 <th className="text-right p-3 font-medium text-slate-600">差異</th>
+                <th className="text-center p-3 font-medium text-slate-600">請求書</th>
                 <th className="text-center p-3 font-medium text-slate-600">通知</th>
               </tr>
             </thead>
@@ -110,6 +110,9 @@ export default function CheckPage() {
                     </td>
                     <td className={`p-3 text-right font-mono ${diff != null && diff !== 0 ? (diff > 0 ? "text-red-600" : "text-yellow-600") : ""}`}>
                       {diff != null ? (diff === 0 ? "±0" : `${diff > 0 ? "+" : ""}${formatCurrency(diff)}`) : "—"}
+                    </td>
+                    <td className="p-3 text-center">
+                      <StatusBadge status={s.bill_status} />
                     </td>
                     <td className="p-3 text-center">
                       {record?.notified ? (

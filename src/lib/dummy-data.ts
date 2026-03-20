@@ -9,6 +9,8 @@ export type Property = {
   delivery_date: string;
 };
 
+export type BillStatus = "confirmed" | "pending" | "diff";
+
 export type PaymentSchedule = {
   id: string;
   property_id: string;
@@ -17,6 +19,7 @@ export type PaymentSchedule = {
   scheduled_date: string;
   scheduled_amount: number;
   notes: string;
+  bill_status: BillStatus;
 };
 
 export type PaymentRecord = {
@@ -64,23 +67,23 @@ const categories = ["申込金", "契約金", "着工金", "中間金", "引渡�
 
 export const paymentSchedules: PaymentSchedule[] = [
   // 山田邸
-  { id: "s1", property_id: "p1", round: 1, category: "申込金", scheduled_date: "2025-11-01", scheduled_amount: 1000000, notes: "" },
-  { id: "s2", property_id: "p1", round: 2, category: "契約金", scheduled_date: "2025-11-15", scheduled_amount: 5501616, notes: "" },
-  { id: "s3", property_id: "p1", round: 3, category: "着工金", scheduled_date: "2025-12-01", scheduled_amount: 10002020, notes: "" },
-  { id: "s4", property_id: "p1", round: 4, category: "中間金", scheduled_date: "2026-03-15", scheduled_amount: 10002020, notes: "" },
-  { id: "s5", property_id: "p1", round: 5, category: "引渡金", scheduled_date: "2026-06-30", scheduled_amount: 6002424, notes: "" },
+  { id: "s1", property_id: "p1", round: 1, category: "申込金", scheduled_date: "2025-11-01", scheduled_amount: 1000000, notes: "", bill_status: "confirmed" },
+  { id: "s2", property_id: "p1", round: 2, category: "契約金", scheduled_date: "2025-11-15", scheduled_amount: 5501616, notes: "", bill_status: "confirmed" },
+  { id: "s3", property_id: "p1", round: 3, category: "着工金", scheduled_date: "2025-12-01", scheduled_amount: 10002020, notes: "", bill_status: "confirmed" },
+  { id: "s4", property_id: "p1", round: 4, category: "中間金", scheduled_date: "2026-03-15", scheduled_amount: 10002020, notes: "", bill_status: "pending" },
+  { id: "s5", property_id: "p1", round: 5, category: "引渡金", scheduled_date: "2026-06-30", scheduled_amount: 6002424, notes: "", bill_status: "pending" },
   // 田中邸
-  { id: "s6", property_id: "p2", round: 1, category: "申込金", scheduled_date: "2025-09-15", scheduled_amount: 1000000, notes: "" },
-  { id: "s7", property_id: "p2", round: 2, category: "契約金", scheduled_date: "2025-10-01", scheduled_amount: 4600000, notes: "" },
-  { id: "s8", property_id: "p2", round: 3, category: "着工金", scheduled_date: "2025-10-15", scheduled_amount: 8400000, notes: "" },
-  { id: "s9", property_id: "p2", round: 4, category: "中間金", scheduled_date: "2026-02-15", scheduled_amount: 8400000, notes: "" },
-  { id: "s10", property_id: "p2", round: 5, category: "引渡金", scheduled_date: "2026-04-30", scheduled_amount: 5600000, notes: "" },
+  { id: "s6", property_id: "p2", round: 1, category: "申込金", scheduled_date: "2025-09-15", scheduled_amount: 1000000, notes: "", bill_status: "confirmed" },
+  { id: "s7", property_id: "p2", round: 2, category: "契約金", scheduled_date: "2025-10-01", scheduled_amount: 4600000, notes: "", bill_status: "confirmed" },
+  { id: "s8", property_id: "p2", round: 3, category: "着工金", scheduled_date: "2025-10-15", scheduled_amount: 8400000, notes: "", bill_status: "confirmed" },
+  { id: "s9", property_id: "p2", round: 4, category: "中間金", scheduled_date: "2026-02-15", scheduled_amount: 8400000, notes: "", bill_status: "diff" },
+  { id: "s10", property_id: "p2", round: 5, category: "引渡金", scheduled_date: "2026-04-30", scheduled_amount: 5600000, notes: "", bill_status: "pending" },
   // 鈴木邸
-  { id: "s11", property_id: "p3", round: 1, category: "申込金", scheduled_date: "2025-12-10", scheduled_amount: 1000000, notes: "" },
-  { id: "s12", property_id: "p3", round: 2, category: "契約金", scheduled_date: "2026-01-01", scheduled_amount: 5100000, notes: "" },
-  { id: "s13", property_id: "p3", round: 3, category: "着工金", scheduled_date: "2026-01-10", scheduled_amount: 9150000, notes: "" },
-  { id: "s14", property_id: "p3", round: 4, category: "中間金", scheduled_date: "2026-04-15", scheduled_amount: 9150000, notes: "" },
-  { id: "s15", property_id: "p3", round: 5, category: "引渡金", scheduled_date: "2026-07-31", scheduled_amount: 6100000, notes: "" },
+  { id: "s11", property_id: "p3", round: 1, category: "申込金", scheduled_date: "2025-12-10", scheduled_amount: 1000000, notes: "", bill_status: "confirmed" },
+  { id: "s12", property_id: "p3", round: 2, category: "契約金", scheduled_date: "2026-01-01", scheduled_amount: 5100000, notes: "", bill_status: "confirmed" },
+  { id: "s13", property_id: "p3", round: 3, category: "着工金", scheduled_date: "2026-01-10", scheduled_amount: 9150000, notes: "", bill_status: "pending" },
+  { id: "s14", property_id: "p3", round: 4, category: "中間金", scheduled_date: "2026-04-15", scheduled_amount: 9150000, notes: "", bill_status: "pending" },
+  { id: "s15", property_id: "p3", round: 5, category: "引渡金", scheduled_date: "2026-07-31", scheduled_amount: 6100000, notes: "", bill_status: "diff" },
 ];
 
 export const paymentRecords: PaymentRecord[] = [
