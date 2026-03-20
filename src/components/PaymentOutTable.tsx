@@ -34,34 +34,34 @@ export default function PaymentOutTable({ data }: { data: PaymentOut[] }) {
   return (
     <div className="bg-white rounded-lg border border-slate-200">
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-xs">
           <thead className="bg-slate-50">
             <tr>
-              <th className="text-left p-3 font-medium text-slate-600">業者名</th>
-              <th className="text-left p-3 font-medium text-slate-600">物件名</th>
-              <th className="text-left p-3 font-medium text-slate-600">工種</th>
-              <th className="text-right p-3 font-medium text-slate-600">発注金額</th>
-              <th className="text-right p-3 font-medium text-slate-600">請求金額</th>
-              <th className="text-right p-3 font-medium text-slate-600">差異</th>
-              <th className="text-left p-3 font-medium text-slate-600">支払予定日</th>
-              <th className="text-left p-3 font-medium text-slate-600">ステータス</th>
+              <th className="text-left py-1.5 px-3 font-medium text-slate-600">業者名</th>
+              <th className="text-left py-1.5 px-3 font-medium text-slate-600">物件名</th>
+              <th className="text-left py-1.5 px-3 font-medium text-slate-600">工種</th>
+              <th className="text-right py-1.5 px-3 font-medium text-slate-600">発注金額</th>
+              <th className="text-right py-1.5 px-3 font-medium text-slate-600">請求金額</th>
+              <th className="text-right py-1.5 px-3 font-medium text-slate-600">差異</th>
+              <th className="text-left py-1.5 px-3 font-medium text-slate-600">支払予定日</th>
+              <th className="text-left py-1.5 px-3 font-medium text-slate-600">ステータス</th>
             </tr>
           </thead>
           <tbody>
             {data.map((row) => (
               <tr key={row.id} className="border-t border-slate-100 hover:bg-slate-50 transition-colors">
-                <td className="p-3">{row.contractor}</td>
-                <td className="p-3">{row.property}</td>
-                <td className="p-3">{row.workType}</td>
-                <td className="p-3 text-right font-mono">{formatCurrency(row.orderedAmount)}</td>
-                <td className="p-3 text-right font-mono">
+                <td className="py-1.5 px-3">{row.contractor}</td>
+                <td className="py-1.5 px-3">{row.property}</td>
+                <td className="py-1.5 px-3">{row.workType}</td>
+                <td className="py-1.5 px-3 text-right font-mono">{formatCurrency(row.orderedAmount)}</td>
+                <td className="py-1.5 px-3 text-right font-mono">
                   {row.billedAmount !== null ? formatCurrency(row.billedAmount) : <span className="text-slate-400">—</span>}
                 </td>
-                <td className="p-3 text-right font-mono">
+                <td className="py-1.5 px-3 text-right font-mono">
                   <DiffCell ordered={row.orderedAmount} billed={row.billedAmount} />
                 </td>
-                <td className="p-3">{row.dueDate}</td>
-                <td className="p-3">
+                <td className="py-1.5 px-3">{row.dueDate}</td>
+                <td className="py-1.5 px-3">
                   <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${statusColors[row.status]}`}>
                     {statusLabels[row.status]}
                   </span>

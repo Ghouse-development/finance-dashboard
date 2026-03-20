@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { paymentOutData, formatCurrency } from "@/lib/dummy-data";
-import type { PaymentOutStatus } from "@/lib/dummy-data";
 import PaymentOutTable from "@/components/PaymentOutTable";
 
 type TabKey = "all" | "diff" | "unissued" | "ok";
@@ -43,36 +42,36 @@ export default function PaymentOutPage() {
   const okAmount = okItems.reduce((sum, d) => sum + d.orderedAmount, 0);
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">出金管理</h2>
+    <div className="px-5 py-4">
+      <h2 className="text-lg font-bold mb-3">出金管理</h2>
 
       {/* KPIカード */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg border border-slate-200 p-4">
+      <div className="grid grid-cols-4 gap-3 mb-3">
+        <div className="bg-white rounded-lg border border-slate-200 p-3">
           <p className="text-xs text-slate-500 mb-1">今月支払予定合計</p>
-          <p className="text-xl font-bold">{formatCurrency(thisMonthDue)}</p>
+          <p className="text-lg font-bold">{formatCurrency(thisMonthDue)}</p>
         </div>
-        <div className="bg-white rounded-lg border border-slate-200 p-4">
+        <div className="bg-white rounded-lg border border-slate-200 p-3">
           <p className="text-xs text-slate-500 mb-1">差異あり件数</p>
-          <p className="text-xl font-bold text-red-600">{diffCount}件</p>
+          <p className="text-lg font-bold text-red-600">{diffCount}件</p>
         </div>
-        <div className="bg-white rounded-lg border border-slate-200 p-4">
+        <div className="bg-white rounded-lg border border-slate-200 p-3">
           <p className="text-xs text-slate-500 mb-1">未着件数</p>
-          <p className="text-xl font-bold text-yellow-600">{unissuedCount}件</p>
+          <p className="text-lg font-bold text-yellow-600">{unissuedCount}件</p>
         </div>
-        <div className="bg-white rounded-lg border border-slate-200 p-4">
+        <div className="bg-white rounded-lg border border-slate-200 p-3">
           <p className="text-xs text-slate-500 mb-1">照合済み</p>
-          <p className="text-xl font-bold text-green-600">{okCount}件 / {formatCurrency(okAmount)}</p>
+          <p className="text-lg font-bold text-green-600">{okCount}件 / {formatCurrency(okAmount)}</p>
         </div>
       </div>
 
       {/* タブ */}
-      <div className="flex gap-1 mb-4 border-b border-slate-200">
+      <div className="flex gap-1 mb-3 border-b border-slate-200">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            className={`px-4 py-1.5 text-xs font-medium border-b-2 transition-colors ${
               activeTab === tab.key
                 ? "border-blue-600 text-blue-600"
                 : "border-transparent text-slate-500 hover:text-slate-700"
