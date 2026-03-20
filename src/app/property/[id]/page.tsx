@@ -2,6 +2,7 @@
 
 import { use } from "react";
 import Link from "next/link";
+import ContractorPaymentTable from "@/components/ContractorPaymentTable";
 import {
   getProperty,
   getSchedulesForProperty,
@@ -61,7 +62,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
       </div>
 
       {/* タイムライン */}
-      <div className="bg-white rounded-lg border border-slate-200 p-6">
+      <div className="bg-white rounded-lg border border-slate-200 p-6 mb-6">
         <h3 className="text-lg font-semibold mb-6">入金タイムライン</h3>
         <div className="space-y-0">
           {schedules
@@ -113,6 +114,9 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
             })}
         </div>
       </div>
+
+      {/* 業者別支払予定 */}
+      <ContractorPaymentTable />
     </div>
   );
 }

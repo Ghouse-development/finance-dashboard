@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {
   properties,
   paymentSchedules,
@@ -11,10 +13,21 @@ import {
   getPaidAmount,
 } from "@/lib/dummy-data";
 
+const CashflowChart = dynamic(() => import("@/components/CashflowChart"), { ssr: false });
+
 export default function Dashboard() {
   const today = new Date();
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
+
+  // 同期ボタン状態
+  const [syncState, setSyncState] = useState<"idle" | "loading" | "done">("idle");
+
+  function handleSync() {
+    if (syncState === "loading") return;
+    setSyncState("loading");
+    setTimeout(() => setSyncState("done"), 2000);
+  }
 
   // 今月の入金予定
   const thisMonthSchedules = paymentSchedules.filter((s) => {
@@ -50,7 +63,35 @@ export default function Dashboard() {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">ダッシュボード</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold">ダッシュボード</h2>
+
+        {/* 同期ボタン */}
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-slate-400">最終同期：2026/03/19 09:00</span>
+          <button
+            onClick={handleSync}
+            disabled={syncState === "loading"}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              syncState === "done"
+                ? "bg-green-600 text-white"
+                : syncState === "loading"
+                ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
+          >
+            {syncState === "loading" && (
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              </svg>
+            )}
+            {syncState === "idle" && "ダンドリワークから取込"}
+            {syncState === "loading" && "取込中…"}
+            {syncState === "done" && "取込完了"}
+          </button>
+        </div>
+      </div>
 
       {/* KPIカード */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -78,6 +119,11 @@ export default function Dashboard() {
           sub={`${futureSchedules.length} 件`}
           color="bg-slate-50 border-slate-200"
         />
+      </div>
+
+      {/* CFグラフ */}
+      <div className="mb-8">
+        <CashflowChart />
       </div>
 
       {/* 直近の入金状況 */}
@@ -109,7 +155,7 @@ export default function Dashboard() {
                     <td className="p-3">{s.scheduled_date}</td>
                     <td className="p-3 text-right">{formatCurrency(s.scheduled_amount)}</td>
                     <td className="p-3 text-center">
-                      <StatusBadge status={status} />
+                      <PaymentStatusBadge status={status} />
                     </td>
                   </tr>
                 );
@@ -177,7 +223,7 @@ function KpiCard({ title, value, sub, color }: { title: string; value: string; s
   );
 }
 
-function StatusBadge({ status }: { status: "入金済" | "未入金" | "予定" }) {
+function PaymentStatusBadge({ status }: { status: "入金済" | "未入金" | "予定" }) {
   return (
     <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
       {status}

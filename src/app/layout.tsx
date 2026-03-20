@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "入金管理",
@@ -26,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`${geistSans.variable} antialiased`}>
+      <body className="antialiased">
         <div className="flex min-h-screen">
           {/* サイドバー */}
           <aside className="w-60 bg-slate-800 text-white flex flex-col shrink-0">
