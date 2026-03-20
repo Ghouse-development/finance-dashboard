@@ -31,13 +31,13 @@ function toMan(value: number) {
 
 export default function CashflowChart() {
   return (
-    <div className="bg-white rounded-lg border border-slate-200 p-4">
-      <h3 className="text-lg font-semibold mb-4">月別キャッシュフロー</h3>
-      <ResponsiveContainer width="100%" height={320}>
+    <div className="bg-white rounded-lg border border-slate-200 p-3">
+      <h3 className="text-sm font-medium mb-2">月別キャッシュフロー</h3>
+      <ResponsiveContainer width="100%" height={200}>
         <ComposedChart data={CASHFLOW_DATA} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-          <YAxis tickFormatter={toMan} tick={{ fontSize: 12 }} width={70} />
+          <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+          <YAxis tickFormatter={toMan} tick={{ fontSize: 11 }} width={60} />
           <Tooltip
             formatter={(value, name) => [
               toMan(Number(value)),
@@ -45,6 +45,7 @@ export default function CashflowChart() {
             ]}
           />
           <Legend
+            wrapperStyle={{ fontSize: 11 }}
             formatter={(value: string) =>
               value === "income" ? "入金" : value === "payment" ? "支払" : "差引"
             }

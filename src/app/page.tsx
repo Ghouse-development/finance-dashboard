@@ -22,6 +22,8 @@ export default function Dashboard() {
 
   // 同期ボタン状態
   const [syncState, setSyncState] = useState<"idle" | "loading" | "done">("idle");
+  // タブ切り替え
+  const [activeTab, setActiveTab] = useState<"recent" | "progress">("recent");
 
   function handleSync() {
     if (syncState === "loading") return;
@@ -62,9 +64,9 @@ export default function Dashboard() {
     .sort((a, b) => new Date(a.scheduled_date).getTime() - new Date(b.scheduled_date).getTime());
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">ダッシュボード</h2>
+    <div className="px-5 py-4">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-lg font-bold">ダッシュボード</h2>
 
         {/* 同期ボタン */}
         <div className="flex items-center gap-3">
@@ -72,7 +74,7 @@ export default function Dashboard() {
           <button
             onClick={handleSync}
             disabled={syncState === "loading"}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               syncState === "done"
                 ? "bg-green-600 text-white"
                 : syncState === "loading"
@@ -81,7 +83,7 @@ export default function Dashboard() {
             }`}
           >
             {syncState === "loading" && (
-              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+              <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
               </svg>
@@ -94,7 +96,7 @@ export default function Dashboard() {
       </div>
 
       {/* KPIカード */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-4 gap-3 mb-3">
         <KpiCard
           title="今月の入金予定"
           value={formatCurrency(thisMonthTotal)}
@@ -122,92 +124,110 @@ export default function Dashboard() {
       </div>
 
       {/* CFグラフ */}
-      <div className="mb-8">
+      <div className="mb-3">
         <CashflowChart />
       </div>
 
-      {/* 直近の入金状況 */}
-      <div className="bg-white rounded-lg border border-slate-200 mb-8">
-        <h3 className="text-lg font-semibold p-4 border-b border-slate-200">直近の入金状況</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50">
-              <tr>
-                <th className="text-left p-3 font-medium text-slate-600">物件名</th>
-                <th className="text-left p-3 font-medium text-slate-600">入金区分</th>
-                <th className="text-left p-3 font-medium text-slate-600">予定日</th>
-                <th className="text-right p-3 font-medium text-slate-600">金額</th>
-                <th className="text-center p-3 font-medium text-slate-600">状態</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentSchedules.map((s) => {
-                const prop = properties.find((p) => p.id === s.property_id);
-                const status = getStatus(s);
-                return (
-                  <tr key={s.id} className="border-t border-slate-100 hover:bg-slate-50">
-                    <td className="p-3">
-                      <Link href={`/property/${s.property_id}`} className="text-blue-600 hover:underline">
-                        {prop?.property_name}
-                      </Link>
-                    </td>
-                    <td className="p-3">{s.category}</td>
-                    <td className="p-3">{s.scheduled_date}</td>
-                    <td className="p-3 text-right">{formatCurrency(s.scheduled_amount)}</td>
-                    <td className="p-3 text-center">
-                      <PaymentStatusBadge status={status} />
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* 物件別入金進捗 */}
+      {/* タブ切り替え */}
       <div className="bg-white rounded-lg border border-slate-200">
-        <h3 className="text-lg font-semibold p-4 border-b border-slate-200">物件別入金進捗</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50">
-              <tr>
-                <th className="text-left p-3 font-medium text-slate-600">物件名</th>
-                <th className="text-right p-3 font-medium text-slate-600">契約金額</th>
-                <th className="text-right p-3 font-medium text-slate-600">入金済</th>
-                <th className="p-3 font-medium text-slate-600 w-64">進捗</th>
-              </tr>
-            </thead>
-            <tbody>
-              {properties.map((prop) => {
-                const paid = getPaidAmount(prop.id);
-                const pct = Math.round((paid / prop.contract_amount) * 100);
-                return (
-                  <tr key={prop.id} className="border-t border-slate-100 hover:bg-slate-50">
-                    <td className="p-3">
-                      <Link href={`/property/${prop.id}`} className="text-blue-600 hover:underline">
-                        {prop.property_name}
-                      </Link>
-                    </td>
-                    <td className="p-3 text-right">{formatCurrency(prop.contract_amount)}</td>
-                    <td className="p-3 text-right">{formatCurrency(paid)}</td>
-                    <td className="p-3">
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 bg-slate-200 rounded-full h-3 overflow-hidden">
-                          <div
-                            className="bg-blue-500 h-3 rounded-full transition-all"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                        <span className="text-xs font-medium text-slate-600 w-10 text-right">{pct}%</span>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="flex items-center gap-2 p-3 border-b border-slate-200">
+          <button
+            onClick={() => setActiveTab("recent")}
+            className={`px-3 py-1 text-xs rounded-md transition-colors ${
+              activeTab === "recent" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500"
+            }`}
+          >
+            直近の入金状況
+          </button>
+          <button
+            onClick={() => setActiveTab("progress")}
+            className={`px-3 py-1 text-xs rounded-md transition-colors ${
+              activeTab === "progress" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500"
+            }`}
+          >
+            物件別入金進捗
+          </button>
         </div>
+
+        {activeTab === "recent" && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead className="bg-slate-50">
+                <tr>
+                  <th className="text-left py-1.5 px-3 font-medium text-slate-600">物件名</th>
+                  <th className="text-left py-1.5 px-3 font-medium text-slate-600">入金区分</th>
+                  <th className="text-left py-1.5 px-3 font-medium text-slate-600">予定日</th>
+                  <th className="text-right py-1.5 px-3 font-medium text-slate-600">金額</th>
+                  <th className="text-center py-1.5 px-3 font-medium text-slate-600">状態</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentSchedules.map((s) => {
+                  const prop = properties.find((p) => p.id === s.property_id);
+                  const status = getStatus(s);
+                  return (
+                    <tr key={s.id} className="border-t border-slate-100 hover:bg-slate-50">
+                      <td className="py-1.5 px-3">
+                        <Link href={`/property/${s.property_id}`} className="text-blue-600 hover:underline">
+                          {prop?.property_name}
+                        </Link>
+                      </td>
+                      <td className="py-1.5 px-3">{s.category}</td>
+                      <td className="py-1.5 px-3">{s.scheduled_date}</td>
+                      <td className="py-1.5 px-3 text-right font-mono">{formatCurrency(s.scheduled_amount)}</td>
+                      <td className="py-1.5 px-3 text-center">
+                        <PaymentStatusBadge status={status} />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {activeTab === "progress" && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead className="bg-slate-50">
+                <tr>
+                  <th className="text-left py-1.5 px-3 font-medium text-slate-600">物件名</th>
+                  <th className="text-right py-1.5 px-3 font-medium text-slate-600">契約金額</th>
+                  <th className="text-right py-1.5 px-3 font-medium text-slate-600">入金済</th>
+                  <th className="py-1.5 px-3 font-medium text-slate-600 w-48">進捗</th>
+                </tr>
+              </thead>
+              <tbody>
+                {properties.map((prop) => {
+                  const paid = getPaidAmount(prop.id);
+                  const pct = Math.round((paid / prop.contract_amount) * 100);
+                  return (
+                    <tr key={prop.id} className="border-t border-slate-100 hover:bg-slate-50">
+                      <td className="py-1.5 px-3">
+                        <Link href={`/property/${prop.id}`} className="text-blue-600 hover:underline">
+                          {prop.property_name}
+                        </Link>
+                      </td>
+                      <td className="py-1.5 px-3 text-right font-mono">{formatCurrency(prop.contract_amount)}</td>
+                      <td className="py-1.5 px-3 text-right font-mono">{formatCurrency(paid)}</td>
+                      <td className="py-1.5 px-3">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                            <div
+                              className="bg-blue-500 h-1.5 rounded-full transition-all"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <span className="text-xs font-medium text-slate-600 w-10 text-right">{pct}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -215,17 +235,17 @@ export default function Dashboard() {
 
 function KpiCard({ title, value, sub, color }: { title: string; value: string; sub: string; color: string }) {
   return (
-    <div className={`rounded-lg border p-4 ${color}`}>
-      <p className="text-sm text-slate-600 mb-1">{title}</p>
-      <p className="text-2xl font-bold">{value}</p>
-      <p className="text-sm text-slate-500 mt-1">{sub}</p>
+    <div className={`rounded-lg border p-3 ${color}`}>
+      <p className="text-xs text-slate-600 mb-1">{title}</p>
+      <p className="text-lg font-bold">{value}</p>
+      <p className="text-xs text-slate-500 mt-0.5">{sub}</p>
     </div>
   );
 }
 
 function PaymentStatusBadge({ status }: { status: "入金済" | "未入金" | "予定" }) {
   return (
-    <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
+    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
       {status}
     </span>
   );

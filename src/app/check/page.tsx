@@ -10,6 +10,12 @@ import {
   formatCurrency,
 } from "@/lib/dummy-data";
 
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return "—";
+  const parts = dateStr.split("-");
+  return `${parts[1]}/${parts[2]}`;
+};
+
 export default function CheckPage() {
   const [filterMonth, setFilterMonth] = useState("");
   const [checkedModal, setCheckedModal] = useState<string | null>(null);
@@ -24,25 +30,25 @@ export default function CheckPage() {
   });
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">入金チェック</h2>
+    <div className="px-5 py-4">
+      <h2 className="text-lg font-medium mb-3">入金チェック</h2>
 
       {/* フィルター */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex gap-4 mb-3">
         <div>
           <label className="block text-xs text-slate-500 mb-1">対象月</label>
           <input
             type="month"
             value={filterMonth}
             onChange={(e) => setFilterMonth(e.target.value)}
-            className="border border-slate-300 rounded-md px-3 py-1.5 text-sm"
+            className="border border-slate-300 rounded-md px-3 py-1 text-xs"
           />
         </div>
         {filterMonth && (
           <div className="flex items-end">
             <button
               onClick={() => setFilterMonth("")}
-              className="text-sm text-slate-500 hover:text-slate-700 underline pb-1.5"
+              className="text-xs text-slate-500 hover:text-slate-700 underline pb-1"
             >
               クリア
             </button>
@@ -53,20 +59,20 @@ export default function CheckPage() {
       {/* テーブル */}
       <div className="bg-white rounded-lg border border-slate-200">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-xs">
             <thead className="bg-slate-50">
               <tr>
-                <th className="p-3 w-12 font-medium text-slate-600">消込</th>
-                <th className="text-left p-3 font-medium text-slate-600">物件名</th>
-                <th className="text-left p-3 font-medium text-slate-600">施主名</th>
-                <th className="text-left p-3 font-medium text-slate-600">入金区分</th>
-                <th className="text-left p-3 font-medium text-slate-600">予定日</th>
-                <th className="text-right p-3 font-medium text-slate-600">予定額</th>
-                <th className="text-left p-3 font-medium text-slate-600">実入金日</th>
-                <th className="text-right p-3 font-medium text-slate-600">実入金額</th>
-                <th className="text-right p-3 font-medium text-slate-600">差異</th>
-                <th className="text-center p-3 font-medium text-slate-600">請求書</th>
-                <th className="text-center p-3 font-medium text-slate-600">通知</th>
+                <th className="py-1.5 px-3 w-10 font-medium text-slate-600">消込</th>
+                <th className="text-left py-1.5 px-3 font-medium text-slate-600 whitespace-nowrap">物件名</th>
+                <th className="text-left py-1.5 px-3 font-medium text-slate-600 whitespace-nowrap">施主名</th>
+                <th className="text-left py-1.5 px-3 font-medium text-slate-600 w-16">区分</th>
+                <th className="text-left py-1.5 px-3 font-medium text-slate-600 w-20">予定日</th>
+                <th className="text-right py-1.5 px-3 font-medium text-slate-600 w-28">予定額</th>
+                <th className="text-left py-1.5 px-3 font-medium text-slate-600 w-20">実入金日</th>
+                <th className="text-right py-1.5 px-3 font-medium text-slate-600 w-28">実入金額</th>
+                <th className="text-right py-1.5 px-3 font-medium text-slate-600 w-20">差異</th>
+                <th className="text-center py-1.5 px-3 font-medium text-slate-600 w-16">請求書</th>
+                <th className="text-center py-1.5 px-3 font-medium text-slate-600 w-16">通知</th>
               </tr>
             </thead>
             <tbody>
@@ -80,7 +86,7 @@ export default function CheckPage() {
 
                 return (
                   <tr key={s.id} className={`border-t border-slate-100 hover:bg-slate-50 ${isOverdue ? "bg-red-50/50" : ""}`}>
-                    <td className="p-3 text-center">
+                    <td className="py-1.5 px-3 text-center">
                       <input
                         type="checkbox"
                         checked={isChecked}
@@ -88,33 +94,33 @@ export default function CheckPage() {
                           if (!isChecked) setCheckedModal(s.id);
                         }}
                         disabled={isChecked}
-                        className="w-4 h-4 accent-green-600"
+                        className="w-3.5 h-3.5 accent-green-600"
                       />
                     </td>
-                    <td className="p-3">
+                    <td className="py-1.5 px-3 whitespace-nowrap">
                       <Link href={`/property/${s.property_id}`} className="text-blue-600 hover:underline">
                         {prop?.property_name}
                       </Link>
                     </td>
-                    <td className="p-3">{prop?.owner_name}</td>
-                    <td className="p-3">
+                    <td className="py-1.5 px-3 whitespace-nowrap">{prop?.owner_name}</td>
+                    <td className="py-1.5 px-3 w-16">
                       <span className="inline-block px-2 py-0.5 bg-slate-100 rounded text-xs">{s.category}</span>
                     </td>
-                    <td className={`p-3 ${isOverdue ? "text-red-600 font-medium" : ""}`}>
-                      {s.scheduled_date}
+                    <td className={`py-1.5 px-3 w-20 ${isOverdue ? "text-red-600 font-medium" : ""}`}>
+                      {formatDate(s.scheduled_date)}
                     </td>
-                    <td className="p-3 text-right font-mono">{formatCurrency(s.scheduled_amount)}</td>
-                    <td className="p-3">{record?.actual_date ?? "—"}</td>
-                    <td className="p-3 text-right font-mono">
+                    <td className="py-1.5 px-3 text-right font-mono w-28">{formatCurrency(s.scheduled_amount)}</td>
+                    <td className="py-1.5 px-3 w-20">{record?.actual_date ? formatDate(record.actual_date) : "—"}</td>
+                    <td className="py-1.5 px-3 text-right font-mono w-28">
                       {record?.actual_amount != null ? formatCurrency(record.actual_amount) : "—"}
                     </td>
-                    <td className={`p-3 text-right font-mono ${diff != null && diff !== 0 ? (diff > 0 ? "text-red-600" : "text-yellow-600") : ""}`}>
+                    <td className={`py-1.5 px-3 text-right font-mono w-20 ${diff != null && diff !== 0 ? (diff > 0 ? "text-red-600" : "text-yellow-600") : ""}`}>
                       {diff != null ? (diff === 0 ? "±0" : `${diff > 0 ? "+" : ""}${formatCurrency(diff)}`) : "—"}
                     </td>
-                    <td className="p-3 text-center">
+                    <td className="py-1.5 px-3 text-center w-16">
                       <StatusBadge status={s.bill_status} />
                     </td>
-                    <td className="p-3 text-center">
+                    <td className="py-1.5 px-3 text-center w-16">
                       {record?.notified ? (
                         <span className="text-xs text-green-600 font-medium">送信済</span>
                       ) : (
