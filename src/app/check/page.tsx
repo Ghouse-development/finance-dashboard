@@ -62,17 +62,16 @@ export default function CheckPage() {
           <table className="w-full text-xs">
             <thead className="bg-slate-50">
               <tr>
-                <th className="py-1.5 px-3 w-10 font-medium text-slate-600">消込</th>
+                <th className="py-1.5 px-3 w-8 text-center font-medium text-slate-600">消込</th>
                 <th className="text-left py-1.5 px-3 font-medium text-slate-600 whitespace-nowrap">物件名</th>
-                <th className="text-left py-1.5 px-3 font-medium text-slate-600 whitespace-nowrap">施主名</th>
-                <th className="text-left py-1.5 px-3 font-medium text-slate-600 w-16">区分</th>
-                <th className="text-left py-1.5 px-3 font-medium text-slate-600 w-20">予定日</th>
+                <th className="text-center py-1.5 px-3 font-medium text-slate-600 w-14">区分</th>
+                <th className="text-center py-1.5 px-3 font-medium text-slate-600 w-16">予定日</th>
                 <th className="text-right py-1.5 px-3 font-medium text-slate-600 w-28">予定額</th>
-                <th className="text-left py-1.5 px-3 font-medium text-slate-600 w-20">実入金日</th>
+                <th className="text-center py-1.5 px-3 font-medium text-slate-600 w-16">実入金日</th>
                 <th className="text-right py-1.5 px-3 font-medium text-slate-600 w-28">実入金額</th>
                 <th className="text-right py-1.5 px-3 font-medium text-slate-600 w-20">差異</th>
                 <th className="text-center py-1.5 px-3 font-medium text-slate-600 w-16">請求書</th>
-                <th className="text-center py-1.5 px-3 font-medium text-slate-600 w-16">通知</th>
+                <th className="text-center py-1.5 px-3 font-medium text-slate-600 w-14">通知</th>
               </tr>
             </thead>
             <tbody>
@@ -86,7 +85,7 @@ export default function CheckPage() {
 
                 return (
                   <tr key={s.id} className={`border-t border-slate-100 hover:bg-slate-50 ${isOverdue ? "bg-red-50/50" : ""}`}>
-                    <td className="py-1.5 px-3 text-center">
+                    <td className="py-1.5 px-3 w-8 text-center">
                       <input
                         type="checkbox"
                         checked={isChecked}
@@ -102,15 +101,14 @@ export default function CheckPage() {
                         {prop?.property_name}
                       </Link>
                     </td>
-                    <td className="py-1.5 px-3 whitespace-nowrap">{prop?.owner_name}</td>
-                    <td className="py-1.5 px-3 w-16">
+                    <td className="py-1.5 px-3 w-14 text-center">
                       <span className="inline-block px-2 py-0.5 bg-slate-100 rounded text-xs">{s.category}</span>
                     </td>
-                    <td className={`py-1.5 px-3 w-20 ${isOverdue ? "text-red-600 font-medium" : ""}`}>
+                    <td className={`py-1.5 px-3 w-16 text-center ${isOverdue ? "text-red-600 font-medium" : ""}`}>
                       {formatDate(s.scheduled_date)}
                     </td>
                     <td className="py-1.5 px-3 text-right font-mono w-28">{formatCurrency(s.scheduled_amount)}</td>
-                    <td className="py-1.5 px-3 w-20">{record?.actual_date ? formatDate(record.actual_date) : "—"}</td>
+                    <td className="py-1.5 px-3 w-16 text-center">{record?.actual_date ? formatDate(record.actual_date) : "—"}</td>
                     <td className="py-1.5 px-3 text-right font-mono w-28">
                       {record?.actual_amount != null ? formatCurrency(record.actual_amount) : "—"}
                     </td>
@@ -120,11 +118,11 @@ export default function CheckPage() {
                     <td className="py-1.5 px-3 text-center w-16">
                       <StatusBadge status={s.bill_status} />
                     </td>
-                    <td className="py-1.5 px-3 text-center w-16">
+                    <td className="py-1.5 px-3 text-center w-14">
                       {record?.notified ? (
-                        <span className="text-xs text-green-600 font-medium">送信済</span>
+                        <span className="text-xs text-green-600 font-medium whitespace-nowrap">送信済</span>
                       ) : (
-                        <span className="text-xs text-slate-400">未送信</span>
+                        <span className="text-xs text-slate-400 whitespace-nowrap">未送信</span>
                       )}
                     </td>
                   </tr>
